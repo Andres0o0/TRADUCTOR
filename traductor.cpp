@@ -199,19 +199,15 @@ void traducir(){
 	cout<<"Que Dato desea ver: ";
 	cin>>pos;
 	cout<<"------------------ "<<pos<<" ------------------"<<endl;
-	fseek ( archivo,pos * sizeof(Planilla), SEEK_SET );
+	fseek ( archivo,pos * sizeof(Palabra), SEEK_SET );
 	
-	Planilla plan;
+	Palabra palabra;
     
-    fread(&plan, sizeof(Planilla), 1, archivo);
+    fread(&plan, sizeof(Palabra), 1, archivo);
 
-    cout << "Codigo: " <<pos<< endl;
-    cout << "Nombre: " << plan.nombre << endl;
-    cout << "Apellido: " << plan.apellido << endl;
-    cout << "Puesto: " << plan.puesto << endl;
-    cout << "Sueldo Base: " << plan.sueldo << endl;
-    cout << "Bonificacion: " << plan.bonificacion << endl;
-    cout << "Total: " << plan.total << endl;
+    cout << "Palabra: " <<pos<< endl;
+    cout << "Traduccion: "<<palabra.traduccion<<endl;
+    cout << "Definicion: " << palabra.definicion << endl;
     cout << endl;
 
     fclose(archivo);
