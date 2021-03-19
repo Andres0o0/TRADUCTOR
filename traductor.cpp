@@ -5,7 +5,6 @@
 #define m 30
 #define d 300
 
-
 using namespace std;
 
 const char *nombe_archivo = "traductor.dat";
