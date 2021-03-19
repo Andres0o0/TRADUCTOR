@@ -1,7 +1,5 @@
-#include <stdlib.h>
 #include <iostream>
 #include <conio.h>
-#include <windows.h>
 #include <stdio.h>
 #include <string.h>
 #define m 30
@@ -146,7 +144,7 @@ void eliminar()
     FILE *temporal = fopen(nom_temporal, "w+b");
     FILE *archivo = fopen(nombe_archivo, "r+b");
     
-    int x,existe=0;
+    int x,existe=0,indice=0,pos=0;
     string pal;
     char p[m],sino;
     
@@ -163,22 +161,42 @@ void eliminar()
 		}
 		if(x==0){
 		existe=1;
+		pos=indice;
 		}
 	fread(&palabra,sizeof(Palabra),1,archivo);	
+	indice++;
 	}while (feof( archivo ) == 0);
 	
 	if(existe==1){
-		cout<<"DATO ELIMINADO"<<endl;
-	}
-	else{
-		cout<<"DATO NO ENCONTRADO"<<endl;	
-	}
-	
-    cout<<endl;
+	fseek ( archivo,pos * sizeof(Palabra), SEEK_SET );
+	fread(&palabra,sizeof(Palabra),1,archivo);	
+	cout<<"PALABRA:   \t"<<palabra.palabra<<endl;
+    cout<<"TRADUCCION:\t"<<palabra.traduccion<<endl;
+    cout<<"DEFINICION:\t"<<palabra.definicion<<endl;
+    cout<<"---------------------------------------\n";
+    fseek ( archivo,pos * sizeof(Palabra), SEEK_SET );
+	cout<<"SEGURO QUE QUIERE ELIMINAR ESTE REGISTRO: [S/N]"<<endl;
+	cin>>sino;
+	if((sino=='s') || (sino=='S') ){
 	fclose(archivo);
 	fclose(temporal);
 	remove("traductor.dat");
     rename("tempo10.dat","traductor.dat");
+    cout<<"REGISTRO ELIMINADO CON EXITO"<<endl;
+	}
+	else{
+	cout<<"EL REGISTRO NO HA SIDO ELIMINADO"<<endl;
+	fclose(archivo);
+	fclose(temporal);
+	remove("tempo10.dat");
+	}
+	}
+	else{
+		cout<<"DATO NO ENCONTRADO"<<endl;
+	fclose(archivo);
+	fclose(temporal);
+	remove("tempo10.dat");	
+	}
     system("PAUSE");
 }
 
@@ -190,124 +208,4 @@ void modificar(){
 
 void traducir(){
 }
-/*void buscar()
-{
 
-   FILE* archivo = fopen(nombe_archivo, "rb");
-	
-	int pos=0;
-	cout<<"Que Dato desea ver: ";
-	cin>>pos;
-	cout<<"------------------ "<<pos<<" ------------------"<<endl;
-	fseek ( archivo,pos * sizeof(Planilla), SEEK_SET );
-	
-	Planilla plan;
-    
-    fread(&plan, sizeof(Planilla), 1, archivo);
-
-    cout << "Codigo: " <<pos<< endl;
-    cout << "Nombre: " << plan.nombre << endl;
-    cout << "Apellido: " << plan.apellido << endl;
-    cout << "Puesto: " << plan.puesto << endl;
-    cout << "Sueldo Base: " << plan.sueldo << endl;
-    cout << "Bonificacion: " << plan.bonificacion << endl;
-    cout << "Total: " << plan.total << endl;
-    cout << endl;
-
-    fclose(archivo);
-    system("PAUSE");
-}
-void modificar()
-{
-    FILE *archivo = fopen(nombe_archivo, "r+b");
-    int id;
-    char respuesta[s];
-    string nombre, apellido, puesto;
-    Planilla plan;
-
-    cout << "Ingrese el ID que desea Modificar: ";
-    cin >> id;
-    fseek(archivo, id * sizeof(Planilla), SEEK_SET); // esto es lo que permite modificar en la pocision
-    fread(&plan, sizeof(Planilla), 1, archivo);
-
-    cout << ("------------   Datos Encontrados -------------")<< endl;
-    cout << ("nombre:  [") << plan.nombre << ("]")<< endl;
-    cout << ("apellido:  [") << plan.apellido << ("]")<< endl;
-    cout << ("Puesto:  [") << plan.puesto << ("]")<< endl;
-    cout << ("Sueldo Base:  [") << plan.sueldo << ("]")<< endl;
-    cout << ("bonificacion [") << plan.bonificacion << ("]")<< endl;
-    cout << ("---------------------------------------------")<< endl;
-    cout << "<\n\n Nombre: " << plan.nombre << endl;
-    cout << ("Desea modificar [s/n]: ")<< endl;
-    cin >> respuesta, s;
-
-    if (strcmp(respuesta, "s") == 0)
-    {
-
-        fseek(archivo, id * sizeof(Planilla), SEEK_SET);
-        cin.ignore();
-        cout << ("Nuevo Nombre : ");
-        getline(cin, nombre);
-        strcpy(plan.nombre, nombre.c_str());
-        fwrite(&plan, sizeof(Planilla), 1, archivo);
-    }
-
-    cout << "\n\nApellido: " << plan.apellido << endl;
-    cout << ("Desea Modificar la Apellido [s/n]: ");
-    cin >> respuesta, s;
-    if (strcmp(respuesta, "s") == 0)
-    {
-        fseek(archivo, id * sizeof(Planilla), SEEK_SET);
-        cin.ignore();
-        cout << "Ingrese Nuevo Apellido: ";
-        getline(cin, apellido);
-        strcpy(plan.apellido, apellido.c_str());
-        fwrite(&plan, sizeof(Planilla), 1, archivo);
-    }
-
-    cout << "\n\nPuesto: " << plan.puesto << endl;
-    cout << ("Desea modificar el puesto [s/n]: ");
-    cin >> respuesta, s;
-    if (strcmp(respuesta, "s") == 0)
-    {
-        fseek(archivo, id * sizeof(Planilla), SEEK_SET);
-        cin.ignore();
-
-        cout << "Ingrese Nuevo Puesto: ";
-        getline(cin, puesto);
-        strcpy(plan.puesto, puesto.c_str());
-        fwrite(&plan, sizeof(Planilla), 1, archivo);
-    }
-
-    cout << "\n\nSueldo: " << plan.sueldo << endl;
-    cout << ("Desea Modificar el Sueldo [s/n]: ");
-    cin >> respuesta, s;
-    if (strcmp(respuesta, "s") == 0)
-    {
-        fseek(archivo, id * sizeof(Planilla), SEEK_SET);
-        cin.ignore();
-
-        cout << "Ingrese Nuevo Sueldo: ";
-        cin >> plan.sueldo;
-        plan.total = plan.sueldo + plan.bonificacion;
-        fwrite(&plan, sizeof(Planilla), 1, archivo);
-    }
-
-    cout << "\n\nBonificion: " << plan.bonificacion << endl;
-    cout << ("Desea Modificar la Bonificacion [s/n]: ");
-    cin >> respuesta, s;
-    if (strcmp(respuesta, "s") == 0){
-        fseek(archivo, id * sizeof(Planilla), SEEK_SET);
-        cin.ignore();
-        cout << "Ingrese la Neva Bonificacion: ";
-        cin >> plan.bonificacion;
-        plan.total = plan.sueldo + plan.bonificacion;
-        fwrite(&plan, sizeof(Planilla), 1, archivo);
-    }
-
-    cout << ("Datos actualizados");
-    fclose(archivo);
-    getch();
-    mostrar();
-}
-*/
