@@ -200,9 +200,118 @@ void eliminar()
 }
 
 void buscar(){
+	FILE* archivo = fopen(nombe_archivo, "rb");
+	Palabra palabra;
+	int x,existe=0,indice=0,pos=0;
+    	string pal;
+    	char p[m],sino;
+    
+    	cout<<"Ingrese palabra a Buscar: "<<endl;
+	fflush(stdin);
+	getline(cin,pal);
+	strcpy(p,pal.c_str());
+
+	fread(&palabra,sizeof(Palabra),1,archivo);	
+	do{
+        x=strcmp(p,palabra.palabra);
+	
+    	if(x==0){
+		existe=1;
+		pos=indice;
+		}
+	fread(&palabra,sizeof(Palabra),1,archivo);	
+	indice++;
+	}while (feof( archivo ) == 0);
+	
+	if(existe==1){
+	fseek ( archivo,pos * sizeof(Palabra), SEEK_SET );
+	fread(&palabra,sizeof(Palabra),1,archivo);	
+	cout<<"PALABRA:   \t"<<palabra.palabra<<endl;
+    cout<<"TRADUCCION:\t"<<palabra.traduccion<<endl;
+    cout<<"DEFINICION:\t"<<palabra.definicion<<endl;
+    cout<<"---------------------------------------\n";
+    fseek ( archivo,pos * sizeof(Palabra), SEEK_SET );
+    
+    fclose(archivo);
+    system("PAUSE");
+}
 }
 
 void modificar(){
+	FILE *archivo = fopen(nombe_archivo, "r+b");
+	Palabra palabra;
+	string pal1, tra1, def1, pal;
+	int x,existe=0,indice=0,pos=0;
+	char p[m];
+	char respuesta[m];
+	cout<< "Ingrese la palabra a modificar"<<endl;
+	fflush(stdin);
+	getline(cin,pal);
+	strcpy(p,pal.c_str());
+	
+	fread(&palabra,sizeof(Palabra),1,archivo);
+	fseek(archivo,pos * sizeof(Palabra), SEEK_SET);	
+	do{
+        x=strcmp(p,palabra.palabra);
+	
+
+	
+	 if(x==0){
+		existe=1;
+		pos=indice;
+		}
+	fread(&palabra,sizeof(Palabra),1,archivo);	
+	indice++;
+	}while(feof(archivo) == 0);
+	
+	cout << ("------------   Datos Encontrados -------------")<<endl;
+    
+    cout << ("Palabra:  [") << palabra.palabra << ("]")<<endl;
+    
+    cout << ("Traduccion:  [") << palabra.traduccion << ("]")<<endl;
+    
+    cout << ("Definicion:  [") << palabra.definicion << ("]")<<endl;
+	fseek ( archivo,pos * sizeof(Palabra), SEEK_SET );
+	cout <<"\n"<<palabra.palabra<<endl;
+	cout <<"Desea modificar la palabra?"<<endl;
+	cin>>respuesta, m;
+	if (strcmp(respuesta, "s") == 0){
+        fseek(archivo, pos * sizeof(Palabra), SEEK_SET);
+        cin.ignore();
+        cout << ("Nueva Palabra : ")<<endl;
+        getline(cin, pal1, '\n');
+        strcpy(palabra.palabra, pal1.c_str());
+        fwrite(&palabra, sizeof(Palabra), 1, archivo);
+    }
+    
+	cout << "\n\nTraduccion: " << palabra.traduccion << endl;
+    cout << ("Desea modificar la traduccion? [s/n]: ");
+    cin >> respuesta, m;
+	if (strcmp(respuesta, "s") == 0){
+        fseek(archivo, pos * sizeof(Palabra), SEEK_SET);
+        cin.ignore();
+        cout << ("Nueva Traduccion: ")<<endl;
+        getline(cin, tra1);
+        strcpy(palabra.traduccion, tra1.c_str());
+        fwrite(&palabra, sizeof(Palabra), 1, archivo);
+    }
+	cout << "\n\nDefinicion: " << palabra.definicion << endl;
+    cout << ("Desea modificar la definicion? [s/n]: ");
+	cin >> respuesta, m;	
+	if (strcmp(respuesta, "s") == 0){
+        fseek(archivo, pos * sizeof(Palabra), SEEK_SET);
+        cin.ignore();
+        cout << ("Nueva Traduccion: ")<<endl;
+        getline(cin, def1);
+        strcpy(palabra.definicion, def1.c_str());
+        fwrite(&palabra, sizeof(Palabra), 1, archivo);
+    }
+    system("cls");
+    cout << ("Los datos han sido actualizados.");
+    system("PAUSE");
+    fclose(archivo);
+    
+
 }
 
 void traducir(){
