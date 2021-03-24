@@ -7,6 +7,14 @@
 
 using namespace std;
 
+void buscar_y_reemplazar(string& frase, string buscar,string rempl){
+	int pos= frase.find(buscar);
+	while (pos != -1){
+		frase.replace(pos,buscar.size(),rempl);
+		pos = frase.find(buscar, pos+ rempl.size());
+	}
+}
+
 const char *nombe_archivo = "traductor.dat";
 const char *nom_temporal = "tempo10.dat";
 
@@ -240,45 +248,45 @@ void buscar(){
 void modificar(){
 	FILE *archivo = fopen(nombe_archivo, "r+b");
 	Palabra palabra;
-	string pal1, tra1, def1, pal;
+	string tra1, def1, pal, pal1;
 	int x,existe=0,indice=0,pos=0;
 	char p[m];
-	char respuesta[m];
+	char respuesta;
 	cout<< "Ingrese la palabra a modificar"<<endl;
 	fflush(stdin);
 	getline(cin,pal);
 	strcpy(p,pal.c_str());
 	
-	fread(&palabra,sizeof(Palabra),1,archivo);
-	fseek(archivo,pos * sizeof(Palabra), SEEK_SET);	
+	fread(&palabra,sizeof(Palabra),1,archivo);	
 	do{
         x=strcmp(p,palabra.palabra);
 	
-
-	
-	 if(x==0){
+    	if(x==0){
 		existe=1;
 		pos=indice;
 		}
 	fread(&palabra,sizeof(Palabra),1,archivo);	
 	indice++;
-	}while(feof(archivo) == 0);
+	}while (feof( archivo ) == 0);
 	
+	if(existe==1){
+	fseek ( archivo,pos * sizeof(Palabra), SEEK_SET );
+	fread(&palabra,sizeof(Palabra),1,archivo);	
+
 	cout << ("------------   Datos Encontrados -------------")<<endl;
     
-    cout << ("Palabra:  [") << palabra.palabra << ("]")<<endl;
+    cout << ("Palabra:     [") << palabra.palabra << ("]")<<endl;
     
     cout << ("Traduccion:  [") << palabra.traduccion << ("]")<<endl;
     
     cout << ("Definicion:  [") << palabra.definicion << ("]")<<endl;
 	fseek ( archivo,pos * sizeof(Palabra), SEEK_SET );
 	cout <<"\n"<<palabra.palabra<<endl;
-	cout <<"Desea modificar la palabra?"<<endl;
-	cin>>respuesta, m;
-	if (strcmp(respuesta, "s") == 0){
-        fseek(archivo, pos * sizeof(Palabra), SEEK_SET);
+	cout <<"Desea modificar la palabra? [s/n]"<<endl;
+	cin>>respuesta;
+	if ((respuesta=='s') || (respuesta=='S') ){
         cin.ignore();
-        cout << ("Nueva Palabra : ")<<endl;
+        cout << ("Nueva Palabra : ");
         getline(cin, pal1, '\n');
         strcpy(palabra.palabra, pal1.c_str());
         fwrite(&palabra, sizeof(Palabra), 1, archivo);
@@ -286,28 +294,30 @@ void modificar(){
     
 	cout << "\n\nTraduccion: " << palabra.traduccion << endl;
     cout << ("Desea modificar la traduccion? [s/n]: ");
-    cin >> respuesta, m;
-	if (strcmp(respuesta, "s") == 0){
-        fseek(archivo, pos * sizeof(Palabra), SEEK_SET);
+    cin >> respuesta;
+	if ((respuesta=='s') || (respuesta=='S') ){
         cin.ignore();
-        cout << ("Nueva Traduccion: ")<<endl;
+        cout << ("Nueva Traduccion: ");
         getline(cin, tra1);
         strcpy(palabra.traduccion, tra1.c_str());
         fwrite(&palabra, sizeof(Palabra), 1, archivo);
     }
 	cout << "\n\nDefinicion: " << palabra.definicion << endl;
     cout << ("Desea modificar la definicion? [s/n]: ");
-	cin >> respuesta, m;	
-	if (strcmp(respuesta, "s") == 0){
-        fseek(archivo, pos * sizeof(Palabra), SEEK_SET);
+	cin >> respuesta;	
+	if ((respuesta=='s') || (respuesta=='S') ){
         cin.ignore();
         cout << ("Nueva Traduccion: ")<<endl;
         getline(cin, def1);
         strcpy(palabra.definicion, def1.c_str());
         fwrite(&palabra, sizeof(Palabra), 1, archivo);
     }
-    system("cls");
     cout << ("Los datos han sido actualizados.");
+}
+if(existe==0){
+	cout<<"palabra no encontrada";
+}
+	cout<<endl;
     system("PAUSE");
     fclose(archivo);
     
@@ -315,5 +325,22 @@ void modificar(){
 }
 
 void traducir(){
+	system("cls");
+	FILE* archivo = fopen(nombe_archivo, "rb");
+	string frase,p1,p2;
+	Palabra palabra;
+	cout<<"INGRESE SU CODIGO Y CUANDO FINALICE INGRESE @: "<<endl<<endl;
+	getline(cin,frase,'@');
+	fread(&palabra,sizeof(Palabra),1,archivo);	
+	do{
+	p1=palabra.palabra;
+	p2=palabra.traduccion;
+	buscar_y_reemplazar(frase, p1, p2);
+	fread ( &palabra, sizeof(Palabra), 1, archivo );
+	} while (feof( archivo ) == 0);
+	cout<<endl<<"SU CODIGO TRADUCIDO ES EL SIGUIENTE:"<<endl;
+	cout<<"------------------------------------"<<endl;
+	 cout<<frase<<endl;
+	fclose(archivo);
+	system("PAUSE");
 }
-
